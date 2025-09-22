@@ -28,7 +28,12 @@ jobs:
           ls -A | grep -i \.xcworkspace$ || true
           ls -A | grep -i \.xcodeproj$ || true
 
-      - name: Build
+      - name: Clean Derived Data
+        run: |
+          echo "Cleaning Derived Data"
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+      - name: Build and Test
         env:
           scheme: VehicleCompanionDebug
           platform: iOS Simulator
@@ -41,7 +46,7 @@ jobs:
 
           # Ensure scheme is set correctly
           scheme=$scheme
-          echo "Building with scheme: $scheme"
+          echo "Building and Testing with scheme: $scheme"
 
           # Detect workspace or project
           if [ "$(ls -A | grep -i \.xcworkspace$)" ]; then
@@ -52,10 +57,10 @@ jobs:
             file_to_build=$(ls -A | grep -i \.xcodeproj$)
           fi
           file_to_build=$(echo $file_to_build | awk '{$1=$1;print}')
-          echo "Building $file_to_build with scheme $scheme"
+          echo "Building and Testing $file_to_build with scheme $scheme"
 
-          # Build the project
-          xcodebuild build-for-testing -scheme "$scheme" -$filetype_parameter "$file_to_build" -destination "platform=$platform,name=$device" | tee xcodebuild_build.log
+          # Build and Test the project
+          xcodebuild clean build test -scheme "$scheme" -$filetype_parameter "$file_to_build" -destination "platform=$platform,name=$device" | tee xcodebuild_build.log
 
       - name: Upload Build Logs
         if: failure()
