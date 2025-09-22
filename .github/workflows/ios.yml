@@ -24,7 +24,6 @@ jobs:
       - name: Debugging Build Files
         run: |
           echo "Looking for .xcworkspace or .xcodeproj files"
-          # Do not fail if no files are found
           ls -A | grep -i \.xcworkspace$ || true
           ls -A | grep -i \.xcodeproj$ || true
 
@@ -33,6 +32,11 @@ jobs:
           echo "Cleaning Derived Data"
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
+      - name: Clean Simulator Build Artifacts
+        run: |
+          echo "Cleaning Simulator Build Artifacts"
+          rm -rf ~/Library/Developer/Xcode/DerivedData/VehicleCompanion-*
+
       - name: Build and Test
         env:
           scheme: VehicleCompanionDebug
@@ -40,8 +44,8 @@ jobs:
         run: |
           set -e  # Exit immediately on error
 
-          # Select simulator
-          device=$(xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//")
+          # Select simulator (you can modify this if needed)
+          device="iPhone 16"
           echo "Using device: $device"
 
           # Ensure scheme is set correctly
@@ -60,7 +64,7 @@ jobs:
           echo "Building and Testing $file_to_build with scheme $scheme"
 
           # Build and Test the project
-          xcodebuild clean build test -scheme "$scheme" -$filetype_parameter "$file_to_build" -destination "platform=$platform,name=$device" | tee xcodebuild_build.log
+          xcodebuild clean build test -scheme "$scheme" -$filetype_parameter "$file_to_build" -destination "platform=$platform,name=$device" -verbose | tee xcodebuild_build.log
 
       - name: Upload Build Logs
         if: failure()
@@ -68,32 +72,3 @@ jobs:
         with:
           name: xcodebuild-logs
           path: xcodebuild_build.log
-
-      - name: Test
-        env:
-          scheme: VehicleCompanionDebug
-          platform: iOS Simulator
-        run: |
-          set -e  # Exit immediately on error
-
-          # Select simulator
-          device=$(xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//")
-          echo "Using device: $device"
-
-          # Ensure scheme is set correctly
-          scheme=$scheme
-          echo "Testing with scheme: $scheme"
-
-          # Detect workspace or project
-          if [ "$(ls -A | grep -i \.xcworkspace$)" ]; then
-            filetype_parameter="workspace"
-            file_to_build=$(ls -A | grep -i \.xcworkspace$)
-          else
-            filetype_parameter="project"
-            file_to_build=$(ls -A | grep -i \.xcodeproj$)
-          fi
-          file_to_build=$(echo $file_to_build | awk '{$1=$1;print}')
-          echo "Testing $file_to_build with scheme $scheme"
-
-          # Test the project
-          xcodebuild test-without-building -scheme "$scheme" -$filetype_parameter "$file_to_build" -destination "platform=$platform,name=$device"
