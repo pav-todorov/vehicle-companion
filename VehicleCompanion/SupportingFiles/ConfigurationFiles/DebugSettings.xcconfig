@@ -1,0 +1,9 @@
+//
+//  DebugSettings.xcconfig
+//  VehicleCompanion
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+TRIP_IDEAS_URL = "https://api2.roadtrippers.com/api/v2/pois/discover?sw_corner=-84.540499,39.079888&ne_corner=-84.494260,39.113254&page_size=50";
