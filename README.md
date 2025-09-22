@@ -106,6 +106,37 @@ If more time was available, I would prioritize:
 
 ---
 
+## 📱 iOS Workflow (GitHub Actions)
+
+This GitHub Actions workflow automates building and testing your iOS project using the default scheme on an available iPhone Simulator. It supports both `.xcodeproj` and `.xcworkspace` setups.
+
+---
+
+### Workflo Triggered On
+
+- **Push** to the `main` branch
+- **Pull Requests** targeting the `main` branch
+
+---
+
+### ⚙️ What It Does
+
+The iOS workflow performs the following steps on macOS:
+
+1. **Checkout Code**  
+   Uses `actions/checkout@v4` to pull your source code into the runner.
+
+2. **Determine Default Scheme**  
+   Automatically detects the default scheme from your Xcode project to avoid hardcoding.
+
+3. **Build the App**  
+   Builds the iOS project or workspace using the default scheme on an available iPhone simulator.
+
+4. **Run Tests**  
+   Executes tests on the built app without rebuilding, saving time and keeping the simulator consistent.
+
+---
+
 ## Summary
 
 This project is built on a modern iOS stack (SwiftUI + SwiftData + Swift Testing), clean architecture (MVVM + Repository), and scalable design principles (Brandbook, state-driven views). It’s structured for easy testing, fast development, and future scalability through automation tools.
