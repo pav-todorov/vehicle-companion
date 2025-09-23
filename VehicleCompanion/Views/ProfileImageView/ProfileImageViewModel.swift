@@ -34,7 +34,6 @@ struct ProfileImage: Transferable {
     }
 }
 
-@MainActor
 class ProfileImageViewModel: ObservableObject {
     @Published var profileImageState: ProfileImageState
     @Published private var vehicle: Vehicle
